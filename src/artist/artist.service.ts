@@ -1,26 +1,46 @@
 import { Injectable } from '@nestjs/common';
+import {Artist} from './entities/artist.entity';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
+import {v4} from 'uuid'
 
 @Injectable()
 export class ArtistService {
-  create(createArtistDto: CreateArtistDto) {
-    return 'This action adds a new artist';
+  
+  private artists: Artist[] = [];
+  
+  create(createArtistDto: CreateArtistDto): Artist {
+    const artist = {
+      id: v4(),
+      ...createArtistDto
+    }
+
+    this.artists.push(artist);
+
+    return artist;
   }
 
-  findAll() {
-    return `This action returns all artist`;
+  findAll(): Artist[] {
+    return this.artists;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} artist`;
+  findOne(id: string) {
+    const artist = this.artists.find(u => u.id === id);
+    if (!artist)
+      return null;
+    
+    return artist;
   }
 
-  update(id: number, updateArtistDto: UpdateArtistDto) {
-    return `This action updates a #${id} artist`;
+  update(artistIndex: number, updateArtistDto: UpdateArtistDto): Artist {
+    this.artists[artistIndex] = {...this.artists[artistIndex], ...updateArtistDto};
+
+    return this.artists[artistIndex]
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} artist`;
+  remove(artistIndex: number, id: string) {
+    this.artists.splice(artistIndex, 1);
+
+    return {message: `Artist with ${id} was removed`};
   }
 }
