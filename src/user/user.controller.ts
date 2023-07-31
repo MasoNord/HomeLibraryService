@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, HttpStatus, ClassSerializerInterceptor, UseInterceptors, ParseUUIDPipe, HttpException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, HttpStatus, ClassSerializerInterceptor, UseInterceptors, ParseUUIDPipe, HttpException, HttpCode } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -26,6 +26,7 @@ export class UserController {
   @Get()
   @ApiOperation({summary: 'Get user', description: 'Get all users'})
   @ApiOkResponse({isArray: true, type: User, description: 'OK'})
+  
   findAll(): User[] {
     return this.userService.findAll().map((u) => new User(u));
   }
@@ -39,7 +40,6 @@ export class UserController {
 
   findOne(@Param('id', ParseUUIDPipe) id: string): User {
     const user: User | null = this.userService.findOne(id);
-    
     if(!user)
       throw new HttpException("Record has not been found", HttpStatus.NOT_FOUND)
     
@@ -56,9 +56,9 @@ export class UserController {
   @ApiForbiddenResponse({description: "User's old password is incorrect"})
 
   update(@Param('id', ParseUUIDPipe) id: string, @Body() updateUserDto: UpdateUserDto): User {
-    const userIndex: number | null = this.userService.findAll().findIndex(u => u.id === id);
+    const userIndex: number = this.userService.findAll().findIndex(u => u.id === id);
     
-    if(userIndex === null)
+    if(userIndex === -1)
       throw new HttpException("Record has not been found", HttpStatus.NOT_FOUND);
 
     if(this.userService.findAll()[userIndex].password !== updateUserDto.oldPassword)
@@ -69,16 +69,17 @@ export class UserController {
   }
 
   @Delete(':id')
-  @ApiOperation({summary: "Remove user from db", description: "Delete a user's record"})
+  @ApiOperation({summary: "Remove user", description: "Delete a user's record"})
   @ApiParam({name: 'id', format: 'uuid'})
   @ApiNotFoundResponse({description: 'User not found'})
   @ApiBadRequestResponse({description: 'Id is not uuid format'})
   @ApiOkResponse({description: 'OK'})
+  @HttpCode(HttpStatus.NO_CONTENT)
   
   remove(@Param('id', ParseUUIDPipe) id: string) {
     const userIndex: number | null = this.userService.findAll().findIndex(u => u.id === id);
 
-    if(userIndex === null)
+    if(userIndex === -1)
       throw new HttpException("Record has not been found", HttpStatus.NOT_FOUND);
     
     return this.userService.remove(userIndex, id);
