@@ -1,26 +1,17 @@
+import {IsString } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
 
-import { IsNotEmpty, IsString, IsUUID } from "class-validator";
+interface CreateUserDtoInterface {
+    login: string,
+    password: string
+}
 
-export class CreateUserDto {    
-    id: string;
-    version: number
-    createdAt: number;
-    updatedAt: number
-    
-    @IsNotEmpty({message: "This field must be filled"})
-    @IsString({message: "Login  must be a string value"})
-    login: string;
+export class CreateUserDto implements CreateUserDtoInterface {
+    @ApiProperty({example: "DoggyFace"})
+    @IsString()
+    public login: string;
 
-    @IsNotEmpty({message: "This field must be filled"})
-    @IsString({message: "Password  must be a string value"})
-    password: string;
-
-    constructor(login: string, password: string, id: string,  version: number, createdAt: number, updatedAt) {
-        this.login = login;
-        this.password = password;
-        this.id = id;
-        this.version = version;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
+    @ApiProperty({example: "qwerty1234"})
+    @IsString()
+    public password: string;
 }
