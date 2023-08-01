@@ -31,9 +31,29 @@ export class TrackService {
     return this.tracks[trackIndex];
   }
 
-  remove(trackIndex: number, id: string) {
+  remove(trackIndex: number, id: string): Object  {
     this.tracks.splice(trackIndex, 1);
 
     return {message: `Track with ${id} has been removed`};
+  }
+
+  removeArtist(artistId: string): void {
+    const artistIndex: number = this.tracks.findIndex(u => u.artistId === artistId);
+
+    console.log(artistIndex);
+    
+    if(artistIndex === -1)
+      throw new HttpException("Record has not been found", HttpStatus.NOT_FOUND);
+    
+    this.tracks[artistIndex].artistId = null;
+  }
+
+  removeAlbum(albumId: string): void {
+    const albumIndex: number = this.tracks.findIndex(u => u.albumId === albumId);
+
+    if(albumIndex === -1)
+      throw new HttpException("Record has not been found", HttpStatus.NOT_FOUND);
+
+    this.tracks[albumIndex].albumId = null
   }
 }
