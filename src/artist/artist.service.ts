@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable} from '@nestjs/common';
 import {Artist} from './entities/artist.entity';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
@@ -6,7 +6,6 @@ import {v4} from 'uuid'
 
 @Injectable()
 export class ArtistService {
-  
   private artists: Artist[] = [];
   
   create(createArtistDto: CreateArtistDto): Artist {
@@ -38,7 +37,7 @@ export class ArtistService {
     return this.artists[artistIndex]
   }
 
-  remove(artistIndex: number, id: string) {
+  remove(artistIndex: number, id: string) {    
     this.artists.splice(artistIndex, 1);
 
     return {message: `Artist with ${id} was removed`};

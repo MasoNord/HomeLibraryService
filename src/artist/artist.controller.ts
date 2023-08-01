@@ -5,6 +5,8 @@ import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { FavoriteService } from 'src/favorite/favorite.service';
 import { Artist } from './entities/artist.entity';
+import { AlbumService } from 'src/album/album.service';
+import { TrackService } from 'src/track/track.service';
 
 @ApiTags('artist')
 @Controller('artist')
@@ -13,6 +15,8 @@ export class ArtistController {
   constructor(
     private readonly artistService: ArtistService,
     // private readonly favoritiesSrvice: FavoriteService
+    private readonly albumService: AlbumService,
+    private readonly trackService: TrackService
     ) {}
 
   @Post()
@@ -79,10 +83,20 @@ export class ArtistController {
 
   remove(@Param('id', ParseUUIDPipe) id: string) {
     const artistIndex: number = this.artistService.findAll().findIndex(u => u.id === id);
-
+    
     if(artistIndex === -1)
       throw new HttpException("Record has not been found", HttpStatus.NOT_FOUND);
-    
+
+    this.albumService.findAll().forEach((a) => {
+      if(a.artistId === id)
+        a.artistId = null;
+    });
+
+    this.trackService.findAll().forEach((t) => {
+      if(t.artistId === id)
+        t.artistId = null;
+    });
+
     return this.artistService.remove(artistIndex, id);
   }
 }
