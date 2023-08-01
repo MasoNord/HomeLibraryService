@@ -79,11 +79,16 @@ export class AlbumController {
   @HttpCode(HttpStatus.NO_CONTENT)
   
   remove(@Param('id', ParseUUIDPipe) id: string) {
-    const album: Album | null = this.albumService.findAll().find(u => u.id === id);
+    const albumIndex: number = this.albumService.findAll().findIndex(u => u.id === id);
 
-    if(!album)
+    if(albumIndex === -1)
       throw new HttpException("Record has not been found", HttpStatus.NOT_FOUND);
+      
+    this.trackService.findAll().forEach((t) => {
+      if (t.albumId === id)
+        t.albumId = null;
+    });
     
-    this.albumService.remove(album);
+    this.albumService.remove(albumIndex, id);
   }
 }

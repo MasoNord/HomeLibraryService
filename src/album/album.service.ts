@@ -1,9 +1,8 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable} from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { Album } from './entities/album.entity';
 import {v4} from 'uuid'
-import { Track } from 'src/track/entity/track.entity';
 import { TrackService } from 'src/track/track.service';
 
 @Injectable()
@@ -12,7 +11,7 @@ export class AlbumService {
   private albums: Album[] = [];
   private trackService: TrackService;
   
-  create(createAlbumDto: CreateAlbumDto): Album {
+  public create(createAlbumDto: CreateAlbumDto): Album {
     const newAlbum = {
       id: v4(),
       ...createAlbumDto
@@ -22,7 +21,7 @@ export class AlbumService {
     return newAlbum;
   }
 
-  findAll(): Album[] {
+  public findAll(): Album[] {
     return this.albums;
   }
 
@@ -39,12 +38,9 @@ export class AlbumService {
     return this.albums[albumIndex]
   }
 
-  remove(album: Album) {
-    const albumIndex: number = this.albums.findIndex(u => u.artistId === album.id);
+  remove(albumIndex: number, id: string) {
     this.albums.splice(albumIndex, 1);
-
-    const tracks: Track = this.trackService.findAll().find(u => u.albumId === album.id);
     
-    tracks.albumId = null;
+    return {message: `Album with ${id} was removed`};
   }
 }
