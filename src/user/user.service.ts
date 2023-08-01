@@ -27,24 +27,24 @@ export class UserService {
 
   public findOne(id: string): User | null {
     const user = this.users.find(u => u.id === id);
-    if (!user) {
+    if (!user)
      return null;
-    }
+
     return user;
   } 
 
-  public update(index: number, updateUserDto: UpdateUserDto) {
+  public update(userIndex: number, updateUserDto: UpdateUserDto) {
 
-    this.users[index].password = updateUserDto.newPassword;
-    this.users[index].version = this.users[index].version + 1;
-    this.users[index].updatedAt = Date.now();
+    this.users[userIndex].password = updateUserDto.newPassword;
+    this.users[userIndex].version = this.users[userIndex].version + 1;
+    this.users[userIndex].updatedAt = Date.now();
 
-    return this.users[index];
+    return this.users[userIndex];
   }
 
-  public remove(index: number, id: string) {
+  public remove(userIndex: number, id: string) {
 
-    this.users.splice(index, 1);
+    this.users.splice(userIndex, 1);
     return {message: `User with ${id} was removed`};
   }
 }

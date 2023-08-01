@@ -41,7 +41,7 @@ export class UserController {
   findOne(@Param('id', ParseUUIDPipe) id: string): User {
     const user: User | null = this.userService.findOne(id);
     if(!user)
-      throw new HttpException("Record has not been found", HttpStatus.NOT_FOUND)
+      throw new HttpException("Record has not been found", HttpStatus.NOT_FOUND);
     
     return new User(user);
   }
