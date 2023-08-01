@@ -1,26 +1,41 @@
 import { Injectable } from '@nestjs/common';
 import { CreateFavoriteDto } from './dto/create-favorite.dto';
-import { UpdateFavoriteDto } from './dto/update-favorite.dto';
+import { Track } from 'src/track/entity/track.entity';
+import { Album } from 'src/album/entities/album.entity';
+import { Artist } from 'src/artist/entities/artist.entity';
 
 @Injectable()
 export class FavoriteService {
-  create(createFavoriteDto: CreateFavoriteDto) {
-    return 'This action adds a new favorite';
+  
+  private favs: CreateFavoriteDto = {tracks: [], albums: [], artists: []};
+  
+  addTrack(track: Track): void {
+    this.favs.tracks.push(track);
   }
 
-  findAll() {
-    return `This action returns all favorite`;
+  addAlbum(album: Album): void {
+    this.favs.albums.push(album);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} favorite`;
+  addArtist(artist: Artist): Artist {
+    this.favs.artists.push(artist);
+
+    return artist;
   }
 
-  update(id: number, updateFavoriteDto: UpdateFavoriteDto) {
-    return `This action updates a #${id} favorite`;
+  findAll(): CreateFavoriteDto{
+    return this.favs;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} favorite`;
+  removeTrack(trackIndex: number) {
+      this.favs.tracks.splice(trackIndex, 1);
+  }
+
+  removeArtist(artistIndex: number) {
+    this.favs.artists.splice(artistIndex, 1);
+  }
+
+  removeAlbum(albumIndex: number) {
+    this.favs.albums.splice(albumIndex, 1);
   }
 }
