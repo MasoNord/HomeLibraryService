@@ -5,9 +5,11 @@ import { AlbumController } from 'src/album/album.controller';
 import { AlbumService } from 'src/album/album.service';
 import { TrackController } from 'src/track/track.controller';
 import { TrackService } from 'src/track/track.service';
+import { FavoriteController } from 'src/favorite/favorite.controller';
+import { FavoriteService } from 'src/favorite/favorite.service';
 
 @Module({
-  controllers: [ArtistController, AlbumController, TrackController],
-  providers: [ArtistService, AlbumService, TrackService]
+  controllers: [ArtistController, AlbumController, TrackController, FavoriteController],
+  providers: [ArtistService, AlbumService, TrackService, FavoriteService]
 })
 export class ArtistModule {}

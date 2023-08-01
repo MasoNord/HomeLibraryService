@@ -12,7 +12,7 @@ import { FavoriteService } from 'src/favorite/favorite.service';
 export class TrackController {
   constructor(
     private readonly trackService: TrackService,
-    // private readonly favoritesService: FavoriteService
+    private readonly favoritesService: FavoriteService
   ){}
 
   @Post()
@@ -83,6 +83,8 @@ export class TrackController {
 
     if(trackIndex === -1)
       throw new HttpException("Record has not been found", HttpStatus.NOT_FOUND);
+
+    this.favoritesService.findAll().tracks.splice(trackIndex, 1);
 
     return this.trackService.remove(trackIndex, id);
   }

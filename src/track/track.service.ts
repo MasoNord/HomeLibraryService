@@ -17,7 +17,7 @@ export class TrackService {
   }
 
   findAll(): Track[] {
-    return [...this.tracks];
+    return this.tracks;
   }
 
   findOne(id: string): Track {

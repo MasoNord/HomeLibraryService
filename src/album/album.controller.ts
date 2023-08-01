@@ -5,6 +5,7 @@ import { UpdateAlbumDto } from './dto/update-album.dto';
 import { ApiTags, ApiOperation, ApiBody, ApiBadRequestResponse, ApiCreatedResponse, ApiOkResponse, ApiParam, ApiNotFoundResponse } from '@nestjs/swagger';
 import { Album } from './entities/album.entity';
 import { TrackService } from 'src/track/track.service';
+import { FavoriteService } from 'src/favorite/favorite.service';
   
 @ApiTags('album')
 @Controller('album')
@@ -12,7 +13,8 @@ import { TrackService } from 'src/track/track.service';
 export class AlbumController {
   constructor(
     private readonly albumService: AlbumService,
-    private readonly trackService: TrackService
+    private readonly trackService: TrackService,
+    private readonly favoriteService: FavoriteService
   ){}
 
   @Post()
@@ -88,6 +90,8 @@ export class AlbumController {
       if (t.albumId === id)
         t.albumId = null;
     });
+
+    this.favoriteService.findAll().albums.splice(albumIndex, 1);
     
     this.albumService.remove(albumIndex, id);
   }

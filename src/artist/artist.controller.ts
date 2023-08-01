@@ -14,7 +14,7 @@ import { TrackService } from 'src/track/track.service';
 export class ArtistController {
   constructor(
     private readonly artistService: ArtistService,
-    // private readonly favoritiesSrvice: FavoriteService
+    private readonly favoritiesSrvice: FavoriteService,
     private readonly albumService: AlbumService,
     private readonly trackService: TrackService
     ) {}
@@ -96,6 +96,8 @@ export class ArtistController {
       if(t.artistId === id)
         t.artistId = null;
     });
+
+    this.favoritiesSrvice.findAll().artists.splice(artistIndex, 1);
 
     return this.artistService.remove(artistIndex, id);
   }
