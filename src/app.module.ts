@@ -7,9 +7,10 @@ import { ArtistModule } from './artist/artist.module';
 import { AlbumModule } from './album/album.module';
 import { TrackModule } from './track/track.module';
 import { FavoriteModule } from './favorite/favorite.module';
+import { PrismaModule } from './nest/prismanpx/prisma.module';
 
 @Module({
-  imports: [UserModule, ArtistModule, AlbumModule, TrackModule, FavoriteModule,  ConfigModule.forRoot()],
+  imports: [UserModule, ArtistModule, AlbumModule, TrackModule, FavoriteModule,  ConfigModule.forRoot(), PrismaModule],
   controllers: [AppController],
   providers: [AppService],
 })

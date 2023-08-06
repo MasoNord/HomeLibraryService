@@ -42,11 +42,12 @@ CREATE TABLE "Track" (
 
 -- CreateTable
 CREATE TABLE "Favorite" (
-    "artistId" TEXT NOT NULL,
-    "albumId" TEXT NOT NULL,
-    "trackId" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "artists" TEXT[],
+    "albums" TEXT[],
+    "tracks" TEXT[],
 
-    CONSTRAINT "Favorite_pkey" PRIMARY KEY ("artistId","albumId","trackId")
+    CONSTRAINT "Favorite_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -66,12 +67,3 @@ ALTER TABLE "Track" ADD CONSTRAINT "Track_artistId_fkey" FOREIGN KEY ("artistId"
 
 -- AddForeignKey
 ALTER TABLE "Track" ADD CONSTRAINT "Track_albumId_fkey" FOREIGN KEY ("albumId") REFERENCES "Album"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Favorite" ADD CONSTRAINT "Favorite_artistId_fkey" FOREIGN KEY ("artistId") REFERENCES "Artist"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Favorite" ADD CONSTRAINT "Favorite_albumId_fkey" FOREIGN KEY ("albumId") REFERENCES "Album"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Favorite" ADD CONSTRAINT "Favorite_trackId_fkey" FOREIGN KEY ("trackId") REFERENCES "Track"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -14,8 +14,8 @@ async function main() {
             version: 1,
             login: "Yohoo",
             password: "qwert1234",
-            createdAt: 1233,
-            updatedAt: 1233  
+            createdAt: new Date().getTime() / 1000,
+            updatedAt: new Date().getTime() / 1000
         }
     });
 
@@ -29,8 +29,8 @@ async function main() {
             version: 1,
             login: "Yohoo",
             password: "qwert123",
-            createdAt: 321,
-            updatedAt: 432
+            createdAt: new Date().getTime() / 1000,
+            updatedAt: new Date().getTime() / 1000
         }
     })
 
