@@ -23,18 +23,18 @@ export class AlbumController {
   @ApiBadRequestResponse({description: 'Body does not contain required field'})
   @ApiCreatedResponse({description: 'The album has been created', type: Album})
   
-  create(@Body() createAlbumDto: CreateAlbumDto): Album {
+  create(@Body() createAlbumDto: CreateAlbumDto): Promise<any> {
     const newAlbum = this.albumService.create(createAlbumDto);
     
-    return new Album(newAlbum);
+    return newAlbum;
   }
 
   @Get()
   @ApiOperation({summary: 'Get album', description: 'Get all albums'})
   @ApiOkResponse({isArray: true, type: Album, description: 'OK'})
   
-  findAll(): Album[] {
-    return this.albumService.findAll().map((u) => new Album(u));
+  findAll(): Promise<any> {
+    return this.albumService.findAll();
   }
 
   @Get(':id')
@@ -44,13 +44,10 @@ export class AlbumController {
   @ApiNotFoundResponse({description: 'Album not found'})
   @ApiBadRequestResponse({description: 'Id is not uuid format'})
   
-  findOne(@Param('id', ParseUUIDPipe) id: string): Album {
-    const album: Album | null = this.albumService.findOne(id);
-    
-    if(!album)
-      throw new HttpException("Record has not been found", HttpStatus.NOT_FOUND);
+  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<any> {
+    const album = this.albumService.findOne(id);
 
-    return new Album(album);
+    return album;
   }
 
   @Put(':id')
@@ -61,15 +58,8 @@ export class AlbumController {
   @ApiNotFoundResponse({description: 'Album not found'})
   @ApiBadRequestResponse({description: 'Id is not uuid format'})
   
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateAlbumDto: UpdateAlbumDto): Album {
-    const albumIndex: number = this.albumService.findAll().findIndex(u => u.id === id);
-
-    if(albumIndex === -1)
-      throw new HttpException("Record has not been found", HttpStatus.NOT_FOUND);
-
-    const updatedAlbum = this.albumService.update(albumIndex, updateAlbumDto);
-
-    return new Album(updatedAlbum);
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateAlbumDto: UpdateAlbumDto): Promise<any> {
+    return this.albumService.update(id, updateAlbumDto);
   }
 
   @Delete(':id')
@@ -80,19 +70,7 @@ export class AlbumController {
   @ApiOkResponse({description: 'OK'})
   @HttpCode(HttpStatus.NO_CONTENT)
   
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    const albumIndex: number = this.albumService.findAll().findIndex(u => u.id === id);
-
-    if(albumIndex === -1)
-      throw new HttpException("Record has not been found", HttpStatus.NOT_FOUND);
-      
-    this.trackService.findAll().forEach((t) => {
-      if (t.albumId === id)
-        t.albumId = null;
-    });
-
-    this.favoriteService.findAll().albums.splice(albumIndex, 1);
-    
-    this.albumService.remove(albumIndex, id);
+  remove(@Param('id', ParseUUIDPipe) id: string): void {
+    this.albumService.remove(id);
   }
 }
