@@ -18,17 +18,16 @@ export class UserController {
   @ApiBadRequestResponse({description: 'Body does not contain required field'})
   @ApiCreatedResponse({description: 'The user has been created', type: User})
   
-  create(@Body() body: CreateUserDto): User {
-    const newUser: User = this.userService.create(body);
-    return new User(newUser);
+  create(@Body() body: CreateUserDto): Promise<any> {
+    return this.userService.create(body);
   }
 
   @Get()
   @ApiOperation({summary: 'Get user', description: 'Get all users'})
   @ApiOkResponse({isArray: true, type: User, description: 'OK'})
-  
-  findAll(): User[] {
-    return this.userService.findAll().map((u) => new User(u));
+
+  findAll(): Promise<any> {
+    return this.userService.findAll()
   }
   
   @Get(':id')
@@ -38,12 +37,10 @@ export class UserController {
   @ApiNotFoundResponse({description: 'User not found'})
   @ApiBadRequestResponse({description: 'Id is not uuid format'})
 
-  findOne(@Param('id', ParseUUIDPipe) id: string): User {
-    const user: User | null = this.userService.findOne(id);
-    if(!user)
-      throw new HttpException("Record has not been found", HttpStatus.NOT_FOUND);
+  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<any> {
+    const user: null | Promise<any> = this.userService.findOne(id);
     
-    return new User(user);
+    return user;
   }
 
   @Put(':id')
@@ -55,17 +52,12 @@ export class UserController {
   @ApiBadRequestResponse({description: 'Id is not uuid format'})
   @ApiForbiddenResponse({description: "User's old password is incorrect"})
 
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateUserDto: UpdateUserDto): User {
-    const userIndex: number = this.userService.findAll().findIndex(u => u.id === id);
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateUserDto: UpdateUserDto): Promise<any> {
+    const updatedAt = Date.now() / 1000;
     
-    if(userIndex === -1)
-      throw new HttpException("Record has not been found", HttpStatus.NOT_FOUND);
-
-    if(this.userService.findAll()[userIndex].password !== updateUserDto.oldPassword)
-      throw new HttpException("oldPassword is invalid", HttpStatus.FORBIDDEN);
-    const updatedUser = this.userService.update(userIndex, updateUserDto);
-
-    return new User(updatedUser);
+    const updatedUser: null | Promise<any> = this.userService.update(id, updateUserDto, updatedAt);
+    
+    return updatedUser;
   }
 
   @Delete(':id')
@@ -76,12 +68,9 @@ export class UserController {
   @ApiOkResponse({description: 'OK'})
   @HttpCode(HttpStatus.NO_CONTENT)
   
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    const userIndex: number | null = this.userService.findAll().findIndex(u => u.id === id);
+  remove(@Param('id', ParseUUIDPipe) id: string): Promise<any> {
 
-    if(userIndex === -1)
-      throw new HttpException("Record has not been found", HttpStatus.NOT_FOUND);
     
-    return this.userService.remove(userIndex, id);
+    return this.userService.remove(id);
   }
 }
