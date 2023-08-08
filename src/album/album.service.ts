@@ -3,11 +3,10 @@ import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { Album } from './entities/album.entity';
 import {v4} from 'uuid'
-import { PrismaClient } from '@prisma/client';
-
+import { PrismaService } from 'src/nest/prismanpx/prisma.service';
 @Injectable()
 export class AlbumService {
-  constructor(private prisma: PrismaClient) {}
+  constructor(private prisma: PrismaService) {}
   
   public async create(createAlbumDto: CreateAlbumDto): Promise<any> {
     const newAlbum = await this.prisma.album.upsert({
@@ -17,9 +16,9 @@ export class AlbumService {
         id: v4(),
         name: createAlbumDto.name,
         artistId: createAlbumDto.artistId,
-        year: createAlbumDto.year
+        year: createAlbumDto.year,
       }
-    })
+    });
 
     return new Album(newAlbum);
   }
@@ -63,24 +62,28 @@ export class AlbumService {
     const album = await this.prisma.album.findUnique({
       where: { id },
     });
+    const fav = await this.prisma.favorite.findUnique({where: {id: 1}});
+    const albumIndex = fav.albums.findIndex((a) => a === id);
     
     if(album === null)
       throw new HttpException("Record has not been found", HttpStatus.NOT_FOUND);
-    
-    this.prisma.album.delete({
-      where: { id }
+
+    (await this.prisma.track.findMany()).forEach(async (t) => {
+      if(t.albumId === id) {
+       await this.prisma.track.update({
+        where: {id: t.id},
+        data: {
+          albumId: null
+        }
+       });
+      }
     });
 
-    (await this.prisma.track.findMany()).forEach(t => {
-      if(t.albumId === id)
-        t.albumId = null;
-    });
-
-    const fav = await this.prisma.favorite.findUnique({where: {id: 1}});
-
-    for (let i = 0; i < fav.albums.length; ++i) {
-      if (fav.albums[i] === id)
-        fav.albums.splice(i, 1);
-    }
+    if(albumIndex !== -1)
+      fav.albums.splice(albumIndex, 1);
+  
+    await this.prisma.album.delete({
+      where: {id}
+    })
   }
 }

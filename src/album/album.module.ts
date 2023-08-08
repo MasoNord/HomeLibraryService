@@ -10,8 +10,8 @@ import { ArtistService } from 'src/artist/artist.service';
 import { PrismaModule } from 'src/nest/prismanpx/prisma.module';
 
 @Module({
-  controllers: [AlbumController, TrackController, FavoriteController, ArtistController],
-  providers: [AlbumService, TrackService, FavoriteService, ArtistService],
+  controllers: [AlbumController],
+  providers: [AlbumService],
   imports: [PrismaModule]
 })
 export class AlbumModule {}

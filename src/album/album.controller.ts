@@ -4,8 +4,6 @@ import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { ApiTags, ApiOperation, ApiBody, ApiBadRequestResponse, ApiCreatedResponse, ApiOkResponse, ApiParam, ApiNotFoundResponse } from '@nestjs/swagger';
 import { Album } from './entities/album.entity';
-import { TrackService } from 'src/track/track.service';
-import { FavoriteService } from 'src/favorite/favorite.service';
   
 @ApiTags('album')
 @Controller('album')
@@ -13,8 +11,6 @@ import { FavoriteService } from 'src/favorite/favorite.service';
 export class AlbumController {
   constructor(
     private readonly albumService: AlbumService,
-    private readonly trackService: TrackService,
-    private readonly favoriteService: FavoriteService
   ){}
 
   @Post()
@@ -70,7 +66,7 @@ export class AlbumController {
   @ApiOkResponse({description: 'OK'})
   @HttpCode(HttpStatus.NO_CONTENT)
   
-  remove(@Param('id', ParseUUIDPipe) id: string): void {
-    this.albumService.remove(id);
+  remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+    return this.albumService.remove(id);
   }
 }

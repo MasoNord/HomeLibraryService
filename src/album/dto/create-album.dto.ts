@@ -19,5 +19,5 @@ export class CreateAlbumDto implements CreateAlbumDtoInterface {
     @ApiPropertyOptional({format: 'uuid', nullable: true})
     @IsOptional()
     @IsUUID()
-    public artistId: string | null
+    public artistId: string | null;
 }
