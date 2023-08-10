@@ -55,8 +55,8 @@ export class ArtistService {
 
   public async remove(id: string) {    
     const artist = await this.prisma.artist.findUnique({where: { id }});
-    const fav = await this.prisma.favorite.findUnique({where: {id: 1}});
-    const artistIndex = fav.artists.findIndex((a) => a === id);
+    const fav = await this.prisma.favorite.findUnique({where: {id: 1}, select: {artists: true}});
+    const artistIndex = fav.artists.findIndex((a) => a,id === id);
 
     if (artist === null)  
       throw new HttpException("Record has not been found", HttpStatus.NOT_FOUND);
@@ -83,8 +83,22 @@ export class ArtistService {
       }
     });
 
-    if(artistIndex !== -1)
+    if(artistIndex !== -1) {
       fav.artists.splice(artistIndex, 1);
+
+      await this.prisma.favorite.update({
+        where: {id: 1},
+        select: {
+          artists: true
+        },
+        data: {
+          artists: {
+            set: fav.artists
+          }
+        } 
+      });
+    }
+      
 
     await this.prisma.artist.delete({
       where: { id }

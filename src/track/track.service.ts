@@ -66,15 +66,26 @@ export class TrackService {
     const track = await this.prisma.track.findUnique({
       where: { id }
     });
-    const fav = await this.prisma.favorite.findUnique({where: {id: 1}})
-    const trackIndex = fav.tracks.findIndex((t) => t === id);
+    const fav = await this.prisma.favorite.findUnique({where: {id: 1}, include: {tracks: true}})
+    const trackIndex = fav.tracks.findIndex((t) => t.id === id);
 
     if (track === null)
       throw new HttpException("Record has not been found", HttpStatus.NOT_FOUND);
 
-    if(trackIndex !== -1)
+    if(trackIndex !== -1) {
       fav.tracks.splice(trackIndex, 1);
-
+      
+      await this.prisma.favorite.update({
+        where: {id: 1},
+        include: {tracks: true},
+        data: {
+          tracks: {
+            set: fav.tracks
+          }
+        }
+      });
+    }
+  
     await this.prisma.track.delete({
       where: { id }
     });
