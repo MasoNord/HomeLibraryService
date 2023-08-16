@@ -62,11 +62,26 @@ export class AlbumService {
     const album = await this.prisma.album.findUnique({
       where: { id },
     });
-    // const fav = await this.prisma.favorite.findUnique({where: {id: 1}});
-    // const albumIndex = fav.albums.findIndex((a) => a === id);
+    const fav = await this.prisma.favorite.findUnique({where: {id: 1}, select: {albums: true}});
+    const albumIndex = fav.albums.findIndex((a) => a.id === id);
     
     if(album === null)
       throw new HttpException("Record has not been found", HttpStatus.NOT_FOUND);
+
+    if(albumIndex !== -1) {
+      fav.albums.splice(albumIndex, 1);
+      await this.prisma.favorite.update({
+        where: {id: 1},
+        include: {
+          albums: true
+        },
+        data: {
+          albums: {
+            set: fav.albums
+          }
+        }
+      })
+    }
 
     (await this.prisma.track.findMany()).forEach(async (t) => {
       if(t.albumId === id) {
@@ -78,9 +93,6 @@ export class AlbumService {
        });
       }
     });
-
-    // if(albumIndex !== -1)
-    //   fav.albums.splice(albumIndex, 1);
   
     await this.prisma.album.delete({
       where: {id}
