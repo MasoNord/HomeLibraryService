@@ -7,9 +7,11 @@ import { ArtistService } from 'src/artist/artist.service';
 import { TrackController } from 'src/track/track.controller';
 import { AlbumController } from 'src/album/album.controller';
 import { ArtistController } from 'src/artist/artist.controller';
+import { PrismaModule } from 'src/nest/prismanpx/prisma.module';
 
 @Module({
-  controllers: [FavoriteController, TrackController, AlbumController, ArtistController],
-  providers: [FavoriteService, TrackService, AlbumService, ArtistService]
+  controllers: [FavoriteController],
+  providers: [FavoriteService],
+  imports: [PrismaModule]
 })
 export class FavoriteModule {}
