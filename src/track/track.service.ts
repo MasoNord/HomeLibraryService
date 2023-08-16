@@ -4,7 +4,6 @@ import { UpdateTrackDto } from './dto/update-track.dto';
 import {v4} from 'uuid'
 import { Track } from './entity/track.entity';
 import { PrismaService } from 'src/nest/prismanpx/prisma.service';
-import { Album } from 'src/album/entities/album.entity';
 
 @Injectable()
 export class TrackService {
