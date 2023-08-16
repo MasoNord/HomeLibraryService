@@ -14,9 +14,6 @@ import { TrackService } from 'src/track/track.service';
 export class ArtistController {
   constructor(
     private readonly artistService: ArtistService,
-    private readonly favoritiesSrvice: FavoriteService,
-    private readonly albumService: AlbumService,
-    private readonly trackService: TrackService
     ) {}
 
   @Post()
@@ -25,16 +22,15 @@ export class ArtistController {
   @ApiBadRequestResponse({description: 'Body does not contain required field'})
   @ApiCreatedResponse({description: 'The artist has been created', type: Artist})
   
-  create(@Body() body: CreateArtistDto): Artist {
-    const newArtist: Artist = this.artistService.create(body);
-    return new Artist(newArtist);
+  create(@Body() body: CreateArtistDto): Promise<any> {
+    return this.artistService.create(body);
   }
 
   @Get()
   @ApiOperation({summary: 'Get artist', description: 'Get all artists'})
   @ApiOkResponse({isArray: true, type: Artist, description: 'OK'})
   
-  findAll(): Artist[] {
+  findAll(): Promise<any> {
     return this.artistService.findAll();
   }
 
@@ -45,13 +41,8 @@ export class ArtistController {
   @ApiNotFoundResponse({description: 'Artist not found'})
   @ApiBadRequestResponse({description: 'Id is not uuid format'})
   
-  findOne(@Param('id', ParseUUIDPipe) id: string): Artist {
-    const artist: Artist | null = this.artistService.findOne(id);
-
-    if(!artist)
-      throw new HttpException("Record has not been found", HttpStatus.NOT_FOUND);
-
-    return new Artist(artist);
+  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<any> {
+    return this.artistService.findOne(id);
   }
 
   @Put(':id')
@@ -62,15 +53,8 @@ export class ArtistController {
   @ApiNotFoundResponse({description: 'Artist not found'})
   @ApiBadRequestResponse({description: 'Id is not uuid format'})
 
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateArtistDto: UpdateArtistDto): Artist {
-    const artistIndex: number = this.artistService.findAll().findIndex(u => u.id === id);
-
-    if(artistIndex === -1)
-      throw new HttpException("Record has not been found", HttpStatus.NOT_FOUND);
-
-    const updatedArtist = this.artistService.update(artistIndex, updateArtistDto);
-
-    return updatedArtist;
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateArtistDto: UpdateArtistDto): Promise<any> {
+    return this.artistService.update(id, updateArtistDto);
   }
 
   @Delete(':id')
@@ -81,24 +65,7 @@ export class ArtistController {
   @ApiOkResponse({description: 'OK'})
   @HttpCode(HttpStatus.NO_CONTENT)
 
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    const artistIndex: number = this.artistService.findAll().findIndex(u => u.id === id);
-    
-    if(artistIndex === -1)
-      throw new HttpException("Record has not been found", HttpStatus.NOT_FOUND);
-
-    this.albumService.findAll().forEach((a) => {
-      if(a.artistId === id)
-        a.artistId = null;
-    });
-
-    this.trackService.findAll().forEach((t) => {
-      if(t.artistId === id)
-        t.artistId = null;
-    });
-
-    this.favoritiesSrvice.findAll().artists.splice(artistIndex, 1);
-
-    return this.artistService.remove(artistIndex, id);
+  remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+    return this.artistService.remove(id);
   }
 }

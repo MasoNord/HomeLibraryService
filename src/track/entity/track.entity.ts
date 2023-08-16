@@ -1,12 +1,14 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 
+
 interface TrackEntity {
     id: string;
     name: string;
     artistId: string | null;
     albumId: string | null;
     duration: number;
+    favoriteId: number
 }
 
 export class Track implements TrackEntity {
@@ -24,6 +26,9 @@ export class Track implements TrackEntity {
     
     @ApiProperty({example: '203'})
     public duration: number;
+
+    @Exclude()
+    public favoriteId: number
     
     constructor(props: Track) {
         Object.assign(this, props);
