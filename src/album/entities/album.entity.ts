@@ -1,26 +1,26 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-interface AlbumInterface{
-    id: string;
-    name: string;
-    year: number;
-    artistId: string | null;
+interface AlbumInterface {
+  id: string;
+  name: string;
+  year: number;
+  artistId: string | null;
 }
 
 export class Album implements AlbumInterface {
-    @ApiProperty({format: 'uuid'})
-    public id: string;
+  @ApiProperty({ format: 'uuid' })
+  public id: string;
 
-    @ApiProperty({example: 'testAlbum'})
-    public name: string;
-    
-    @ApiProperty({example: 2013})
-    public year: number;
+  @ApiProperty({ example: 'testAlbum' })
+  public name: string;
 
-    @ApiPropertyOptional({format: 'uuid', nullable: true})
-    public artistId: string | null
+  @ApiProperty({ example: 2013 })
+  public year: number;
 
-    constructor(props: Album) {
-        Object.assign(this, props);
-    }
+  @ApiPropertyOptional({ format: 'uuid', nullable: true })
+  public artistId: string | null;
+
+  constructor(props: Album) {
+    Object.assign(this, props);
+  }
 }
