@@ -6,7 +6,7 @@ import { PrismaModule } from 'src/nest/prismanpx/prisma.module';
 @Module({
   controllers: [UserController],
   providers: [UserService],
-  imports: [PrismaModule]
+  imports: [PrismaModule],
 })
 export class UserModule {}
 
