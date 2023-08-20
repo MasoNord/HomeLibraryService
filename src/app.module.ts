@@ -9,6 +9,7 @@ import { TrackModule } from './track/track.module';
 import { FavoriteModule } from './favorite/favorite.module';
 import { PrismaModule } from './nest/prismanpx/prisma.module';
 import { AppLoggerMiddleware } from './middleware/app-logger-middleware';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { AppLoggerMiddleware } from './middleware/app-logger-middleware';
     FavoriteModule,
     ConfigModule.forRoot(),
     PrismaModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
