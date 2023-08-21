@@ -46,6 +46,19 @@ export class UserService {
     return new User(user);
   }
 
+  public async findOneByLogin(login: string){
+    const users = await this.prisma.user.findMany();
+    const user = users.find((u) => u.login === login);
+
+    if(user === null)
+      throw new HttpException(
+        'Record has not been found',
+        HttpStatus.NOT_FOUND,
+      );
+      
+    return new User(user);
+  }
+
   public async update(
     id: string,
     updateUserDto: UpdateUserDto,
