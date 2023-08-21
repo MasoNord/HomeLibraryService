@@ -5,6 +5,11 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { AllHttpExceptionFiler } from './utils/http-exception.filter';
 
+//TODO: Implement authorization
+//TODO: Add ability writing logs into separated files
+//TODO: Add keeping JWT secret key in .env file
+
+
 
 const configService = new ConfigService();
 const PORT = parseInt(configService.get<string>('PORT'));
@@ -23,7 +28,6 @@ async function bootstrap() {
 
   SwaggerModule.setup('doc', app, document);
 
-  // app.useLogger(app.get(MyLogger));
   app.useGlobalFilters(new AllHttpExceptionFiler(app.get(HttpAdapterHost)));
   app.useGlobalPipes(new ValidationPipe());
   
