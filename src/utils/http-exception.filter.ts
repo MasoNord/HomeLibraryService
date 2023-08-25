@@ -4,32 +4,33 @@ import {
   ArgumentsHost,
   HttpException,
   HttpStatus,
-  Logger
+  Logger,
+  UnauthorizedException
 } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 
-@Catch()
+@Catch(HttpException, UnauthorizedException)
 export class AllHttpExceptionFiler implements ExceptionFilter {
   constructor(private readonly httAdapterHost: HttpAdapterHost) {}
 
-  catch(execption: unknown, host: ArgumentsHost): void {
+  catch(exception: HttpException | UnauthorizedException, host: ArgumentsHost): void {
     const { httpAdapter } = this.httAdapterHost;
-    const logger = new Logger("HTTP")
+    const logger = new Logger(AllHttpExceptionFiler.name)
     const ctx = host.switchToHttp();
-
+    const request = ctx.getRequest<Request>();
+    
     const httpStatus =
-      execption instanceof HttpException
-        ? execption.getStatus()
+    exception instanceof HttpException
+        ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
     const responseBody = {
       statusCode: httpStatus,
-      timestamp: new Date().toISOString(),
-      path: httpAdapter.getRequestUrl(ctx.getRequest()),
-      method: httpAdapter.getRequestMethod(ctx.getRequest())
+      path: request.url,
+      method: request.method
     };
 
-    httpAdapter.reply(ctx.getResponse(), execption['response'], httpStatus);
-    logger.error(`${responseBody.statusCode}  {${responseBody.path}, ${responseBody.method}} route`);
+    httpAdapter.reply(ctx.getResponse(), exception['response'], httpStatus);
+    logger.error(`${JSON.stringify(responseBody)}`);
   }
 }
