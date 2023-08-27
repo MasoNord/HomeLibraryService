@@ -59,6 +59,14 @@ export class UserService {
     return user;
   }
 
+  public async checkUser(login: string): Promise<boolean> {
+    const users = await this.prisma.user.findMany();
+    const user = users.find((u) => u.login === login);
+    if(user)
+      return true;
+    return false;
+  }
+
   public async update(
     id: string,
     updateUserDto: UpdateUserDto,
