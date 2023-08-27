@@ -1,12 +1,11 @@
-import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
 import { PrismaService } from 'src/nest/prismanpx/prisma.service';
 import { v4 } from 'uuid';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
-import { hashPassword } from 'src/utils/hashing-password';
-import { comparePasswords } from 'src/utils/check-password';
-import * as bcrypt from 'bcrypt';
+import { hashData } from 'src/utils/hashing-password';
+import { compareHashedData } from 'src/utils/check-password';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -20,11 +19,12 @@ export class AuthService {
 
     async signIn(login: string, pass: string): Promise<any> {
         const user = await this.userService.findOneByLogin(login);
-        if ((await comparePasswords(pass, user?.password)) === false) {
+        if ((await compareHashedData(pass, user?.password)) === false) {
             throw new UnauthorizedException();
         }
         
         const tokens = await this.getTokens(user.id, user.login);
+        await this.updateRefreshToken(user.id, tokens.refreshToken);
         return tokens;
     }
 
@@ -34,10 +34,14 @@ export class AuthService {
         if(userExists === true)
             throw new BadRequestException('User already exists');
 
-        const hashedPassword = hashPassword(createUserDto.password);
+        const hashedPassword = hashData(createUserDto.password);
+        const userId = v4();
+        const tokens = await this.getTokens(userId, createUserDto.login);
+        const hashedRefreshToken = (await hashData(tokens.refreshToken)).toString();
+        
         const user = await this.prisma.user.upsert({
             where: {
-              id: v4(),
+              id: userId,
             },
             update: {},
             create: {
@@ -47,19 +51,25 @@ export class AuthService {
               version: 1,
               createdAt: new Date().getTime() / 1000,
               updatedAt: new Date().getTime() / 1000,
+              refreshToken: hashedRefreshToken
             },
         });
-        const tokens = await this.getTokens(user.id, user.login);
-      
+        
         return tokens;
     }
+
+    async updateRefreshToken(userId: string, refreshToken: string) {
+        const hashedRefreshToken = (await hashData(refreshToken)).toString();
+        await this.userService.setNewRefreshToken(userId, hashedRefreshToken);
+      }
 
     async getTokens(userId: string, userLogin: string) {
         const [accessToken, refreshToken] = await Promise.all([
             this.jwtService.signAsync(
                 {
                     id: userId,
-                    login: userLogin
+                    login: userLogin,
+                    test: "Test"
                 },
                 {
                     secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
@@ -69,7 +79,8 @@ export class AuthService {
             this.jwtService.signAsync(
                 {
                     id: userId,
-                    login: userLogin
+                    login: userLogin,
+                    test: "Test"
                 },
                 {
                     secret: this.configService.get<string>('JWT_REFERSH_SECRET'),
@@ -77,10 +88,21 @@ export class AuthService {
                 },
             ),
         ]);
-        
         return {
             accessToken,
             refreshToken
         }
+    }
+    async refreshTokens(userId: string) {
+        const user = await this.userService.findOne(userId);
+        
+        if(!user || !user.refreshToken)
+            throw new ForbiddenException('Access Denied');
+        
+        const tokens = await this.getTokens(user.id, user.login);
+        await this.updateRefreshToken(user.id, tokens.refreshToken);
+        
+        return tokens;
+
     }
 }
