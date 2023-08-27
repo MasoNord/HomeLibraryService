@@ -1,8 +1,8 @@
 import * as bcrypt from 'bcrypt'
 
-export async function hashPassword(password: string): Promise<string> {
+export async function hashData(data: string): Promise<string> {
     const saltOrRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltOrRounds);
+    const hashedPassword = await bcrypt.hash(data, saltOrRounds);
     
     return hashedPassword;
 }

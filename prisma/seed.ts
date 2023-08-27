@@ -16,6 +16,7 @@ async function main() {
             password: "qwert1234",
             createdAt: new Date().getTime() / 1000,
             updatedAt: new Date().getTime() / 1000,
+            refreshToken: ""
         }
     });
     const favorite = await prisma.favorite.upsert({

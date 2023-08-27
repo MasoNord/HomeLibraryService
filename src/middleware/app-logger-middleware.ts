@@ -28,20 +28,16 @@ export class AppLoggerMiddleware implements NestMiddleware  {
 
         response.on('finish', () => {
             const {statusCode} = response;
-            const contentForConsole = `${JSON.stringify(request.url)} ${JSON.stringify(request.params)} ${JSON.stringify(request.method)} ${JSON.stringify(statusCode)}`;
             const contentForFile = `${JSON.stringify(responseBody.timestamp)} ${JSON.stringify(request.url)} ${JSON.stringify(request.params)} ${JSON.stringify(request.method)} ${statusCode} \n`;
 
             if(statusCode >= 400 && statusCode < 500) {
-                this.logger.warn(contentForConsole);    
-                this.filename = "warn.txt";                 
+                this.filename = "error.txt";                 
             }
             else if(statusCode >= 200 && statusCode < 400){
-                this.logger.log(contentForConsole);
                 this.filename = "log.txt";
             }
             else {
-                this.logger.error(contentForConsole);
-                this.filename = "error.txt";
+                this.filename = "warn.txt";
             }
             
             fs.appendFileSync(
