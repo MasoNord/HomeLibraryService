@@ -40,7 +40,6 @@ import {
 
         request['user'] = payload;
       } catch {
-        console.log("Something went wrong 2");
         throw new UnauthorizedException();
       }
       return true;
