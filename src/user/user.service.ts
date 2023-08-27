@@ -22,6 +22,7 @@ export class UserService {
         version: 1,
         createdAt: new Date().getTime() / 1000,
         updatedAt: new Date().getTime() / 1000,
+        refreshToken: ""
       },
     });
 
@@ -98,6 +99,18 @@ export class UserService {
 
     return new User(user);
   }
+
+  public async setNewRefreshToken(userId: string, refreshToken: string): Promise<void> {
+    await this.prisma.user.update({
+      where: {
+        id: userId
+      },
+      data: {
+        refreshToken: refreshToken
+      }
+    })
+  }
+
 
   public async remove(id: string) {
     const user = await this.prisma.user.findUnique({
